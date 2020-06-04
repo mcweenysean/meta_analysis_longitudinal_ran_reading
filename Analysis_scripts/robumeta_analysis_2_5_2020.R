@@ -13,14 +13,12 @@ summary_stats <- effect_sizes_long_full %>%
   group_by(umbrella) %>%
   summarise(max_per_study = max(total_n), age = mean(age_months), age_sd = mean(age_months_sd), 
             time_between = mean(timelapse))
-(sum(summary_stats$max_per_study))
+(n <- sum(summary_stats$max_per_study))
 
-describe(summary_stats[,2:ncol(summary_stats)], na.rm = T)
+(desc <- describe(summary_stats[,2:ncol(summary_stats)], na.rm = T))
 
-# test <- effect_sizes_long_full %>%
-#   group_by(umbrella) %>%
-#   summarise(risk = any(sample_type))
-#fisherz2r(-.43)
+
+paste0("The sample (n = ", n, ") was drawn from ", max(desc$n), " independent samples across 68 papers. For studies that reported an initial age, the mean initial age was ", round(desc$mean[2], 2),  " months with a mean SD of ", round(desc$mean[3], 2), ". The mean interval between initial and final timepoints was ", round(desc$mean[4], 2), " months, which is consistent with our prioritization of the Grade 2 timepoint.")
 
 
 dat2 <- escalc(measure="ZCOR", ri=cor, ni=total_n, data=effect_sizes_long_full, slab=umbrella) 
@@ -33,28 +31,13 @@ all_intercept <- robu(formula = final_e_size ~ 1, data = dat2,
 print(all_intercept)
 fisherz2r(all_intercept[["b.r"]])
 
-dat3 <- dat2 %>%
-  filter(!citation == "Biddle, 1996")
-
-rme <- rma(yi = dat3$final_e_size, vi = dat3$vi)
- 
- 
-funnel(rme)
 
 
-dat_r <- dat2[order(dat2$reading_measure),]
+m0 <- robu(formula = final_e_size ~ 1 + published, data = dat2,
+           studynum = umbrella, var.eff.size = vi)
 
-dat_r <- dat_r %>%
-  select(reading_measure, final_e_size, umbrella, ran_type)
-
-
-dev.off()
-forest.robu(all_intercept, es.lab = "citation", study.lab = "umbrella",
-            "r" = flip_cor, "RAN_Type" = ran_type, "Reading Measure" = reading_measure, 
-            "Length" = timespan)
-
-
-
+m00 <- robu(formula = final_e_size ~ 1 + emailed, data = dat2,
+            studynum = umbrella, var.eff.size = vi)
 
 m1 <- robu(formula = final_e_size ~ 1 + latent_cor, data = dat2,
            studynum = umbrella, var.eff.size = vi)
@@ -74,14 +57,10 @@ m4 <- robu(formula = final_e_size ~ 1 + ran_alphanumeric, data = dat2,
 m5 <- robu(formula = final_e_size ~ 1 + comprehension, data = dat2,
            studynum = umbrella, var.eff.size = vi)
 
-
-m6 <- robu(formula = final_e_size ~ 1 + time, data = dat2,
+m6 <- robu(formula = final_e_size ~ 1 + timed, data = dat2,
            studynum = umbrella, var.eff.size = vi)
 
-m7  <- robu(formula = final_e_size ~ 1 + fluency1, data = dat2,
-            studynum = umbrella, var.eff.size = vi)
-
-m8  <- robu(formula = final_e_size ~ 1 + fluency2, data = dat2,
+m7  <- robu(formula = final_e_size ~ 1 + fluency, data = dat2,
             studynum = umbrella, var.eff.size = vi)
 
 
@@ -111,7 +90,23 @@ m17 <- robu(formula = final_e_size ~ 1 + connected, data = dat2,
 
 
 
-dat2$time
+
+dev.off()
+forest.robu(all_intercept, es.lab = "citation", study.lab = "umbrella",
+            "r" = flip_cor, "RAN_Type" = ran_type, "Reading Measure" = reading_measure, 
+            "Length" = timespan)
+
+
+rme <- rma(yi = dat3$final_e_size, vi = dat3$vi)
+funnel(rme)
+
+dat3 <- dat2 %>%
+  filter(!citation == "Biddle, 1996")
+
+dat_r <- dat2[order(dat2$reading_measure),]
+
+dat_r <- dat_r %>%
+  select(reading_measure, final_e_size, umbrella, ran_type)
 
 
 
