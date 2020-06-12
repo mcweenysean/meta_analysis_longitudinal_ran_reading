@@ -1,10 +1,13 @@
 source("/Volumes/NortonLab/Longitudinal_RAN_Reading_Meta_Analysis/Meta_analysis_new_and_improved/R_Scripts/REDCap_sources/load_full_screen.R")
 
-dat_og <- dat[seq(1, 832, 2),]
+dat_og <- dat[seq(1, 844, 2),]
+
+dat_og %>% 
+  count(inclusion_exclusion)
 
 consensus <- dat$inclusion_exclusion == lag(dat$inclusion_exclusion)
-consensus <- data.frame(consensus[-(seq(1, 832, 2))])
-consensus <- data.frame(cbind(consensus = consensus[1:416,]), dat_og$record_id)
+consensus <- data.frame(consensus[-(seq(1, 844, 2))])
+consensus <- data.frame(cbind(consensus = consensus[1:422,]), dat_og$record_id)
 
 consensus$record_id2 <- gsub("[1]", "[2]", consensus$dat_og.record_id, fixed = 2)
 consensus$dat_og.record_id <- as.character(consensus$dat_og.record_id)

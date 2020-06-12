@@ -211,11 +211,14 @@ effect_sizes$timelapse <- effect_sizes$final_timepoint - effect_sizes$initial_ti
 effect_sizes$timespan <- paste0(effect_sizes$init_text, "-to-", effect_sizes$final_text)
 
 
-effect_sizes$risk <- ifelse(effect_sizes$sample_type %in% c("School-based sample", "Control Group (typical/good PA/No-Risk Group)", "Gifted"), "Low Risk",
+
+
+
+effect_sizes$risk <- ifelse(effect_sizes$sample_type %in% c("School-based sample", "Not specified", "Control Group (typical/good PA/No-Risk Group)", "Gifted"), "Low Risk",
                             ifelse(effect_sizes$sample_type == "Oversampled for dyslexia, but has lots of typicals as well", "Medium Risk", 
                             ifelse(effect_sizes$sample_type %in% c("Dyslexia Group (retroactive classification)", "Only dyslexia-risk"), "High Risk", NA
                                    )))
-
+effect_sizes$risk <- factor(effect_sizes$risk)
 
 
 
@@ -341,7 +344,7 @@ library(psych)
 
 #select all variables that may be included in final analyses
 effect_sizes_long_full <- effect_sizes_long %>%
-  select(record_id, citation, umbrella, total_n, published, emailed, timelapse, timespan, initial_timepoint, final_timepoint, 
+  select(record_id, citation, umbrella, total_n, published, emailed, timelapse, timespan, initial_timepoint, final_timepoint, init_text, final_text,
          latent_cor, ran_score, ran_item_num, ran_item_unique, ran_std, ran_array_num, ran_alt, total_ran_items, 
          reading_measure, reading_measure_other, comprehension_composite, decoding_composite, fluency_composite, gen_reading_composite, ran_type, age_months, age_months_sd, sample_type, risk,
          cor, flip) %>%
@@ -365,6 +368,9 @@ effect_sizes_long_full <- effect_sizes_long_full %>%
 #combine flip and z transform
 effect_sizes_long_full <- effect_sizes_long_full %>%
   mutate(final_e_size = std_z*flip)
+
+effect_sizes_long_full <- effect_sizes_long_full %>%
+  mutate(flip_cor = flip * cor)
 
 #### reading measure other replace reading measure
 effect_sizes_long_full$reading_measure <- as.character(effect_sizes_long_full$reading_measure)
@@ -396,11 +402,14 @@ effect_sizes_long_full$ran_alphanumeric <- ifelse(is.na(effect_sizes_long_full$r
 effect_sizes_long_full$ran_colors_objects <- ifelse(effect_sizes_long_full$ran_type == "Colors", "Colors", 
                                                     ifelse(effect_sizes_long_full$ran_type == "Objects", "Objects", NA))
 
+effect_sizes_long_full$ran_comp <- ifelse(str_detect(effect_sizes_long_full$ran_type, "Composite"), "Composite", "NotComposite")
+
 x <- readxl::read_xlsx("/Volumes/NortonLab/Longitudinal_RAN_Reading_Meta_Analysis/Meta_analysis_new_and_improved/Reading Measures/Reading Measures Meta Analysis.xlsx")
 x <- x %>% select(-notes, -notes2, -described)
 x[x == "NA"] <- NA
 
 effect_sizes_long_full <- full_join(effect_sizes_long_full, x, by = "reading_measure")
+
 
 
   

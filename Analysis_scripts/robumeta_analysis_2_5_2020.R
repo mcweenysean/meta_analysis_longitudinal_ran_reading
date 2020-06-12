@@ -5,23 +5,8 @@ library(metafor)
 library(robumeta)
 library(clubSandwich)
 
-effect_sizes_long_full <- effect_sizes_long_full %>%
-  mutate(flip_cor = flip * cor)
-
-
-summary_stats <- effect_sizes_long_full %>%
-  group_by(umbrella) %>%
-  summarise(max_per_study = max(total_n), age = mean(age_months), age_sd = mean(age_months_sd), 
-            time_between = mean(timelapse))
-(n <- sum(summary_stats$max_per_study))
-
-(desc <- describe(summary_stats[,2:ncol(summary_stats)], na.rm = T))
-
-
-paste0("The sample (n = ", n, ") was drawn from ", max(desc$n), " independent samples across 68 papers. For studies that reported an initial age, the mean initial age was ", round(desc$mean[2], 2),  " months with a mean SD of ", round(desc$mean[3], 2), ". The mean interval between initial and final timepoints was ", round(desc$mean[4], 2), " months, which is consistent with our prioritization of the Grade 2 timepoint.")
-
-
 dat2 <- escalc(measure="ZCOR", ri=cor, ni=total_n, data=effect_sizes_long_full, slab=umbrella) 
+
 dat2$sda <- sqrt(dat2$vi)
 
 
@@ -32,61 +17,123 @@ print(all_intercept)
 fisherz2r(all_intercept[["b.r"]])
 
 
-
-m0 <- robu(formula = final_e_size ~ 1 + published, data = dat2,
-           studynum = umbrella, var.eff.size = vi)
-
-m00 <- robu(formula = final_e_size ~ 1 + emailed, data = dat2,
-            studynum = umbrella, var.eff.size = vi)
-
 m1 <- robu(formula = final_e_size ~ 1 + latent_cor, data = dat2,
            studynum = umbrella, var.eff.size = vi)
 
-
-m2 <- robu(formula = final_e_size ~ 1 + initial_timepoint + final_timepoint, data = dat2,
+m2 <- robu(formula = final_e_size ~ 1 + ran_alphanumeric, data = dat2,
            studynum = umbrella, var.eff.size = vi)
-
 
 m3 <- robu(formula = final_e_size ~ 1 + ran_colors_objects, data = dat2,
-            studynum = umbrella, var.eff.size = vi)
-
-m4 <- robu(formula = final_e_size ~ 1 + ran_alphanumeric, data = dat2,
            studynum = umbrella, var.eff.size = vi)
 
 
-m5 <- robu(formula = final_e_size ~ 1 + comprehension, data = dat2,
+m4 <- robu(formula = final_e_size ~ 1 + total_ran_items + ran_item_unique, data = dat2,
            studynum = umbrella, var.eff.size = vi)
 
-m6 <- robu(formula = final_e_size ~ 1 + timed, data = dat2,
+m5 <- robu(formula = final_e_size ~ 1 + ran_std, data = dat2,
            studynum = umbrella, var.eff.size = vi)
 
-m7  <- robu(formula = final_e_size ~ 1 + fluency, data = dat2,
+m6 <- robu(formula = final_e_size ~ 1 + ran_comp, data = dat2,
+           studynum = umbrella, var.eff.size = vi)
+
+
+m7 <- robu(formula = final_e_size ~ 1 + comprehension, data = dat2,
+          studynum = umbrella, var.eff.size = vi)
+ 
+m8 <- robu(formula = final_e_size ~ 1 + timed, data = dat2,
+            studynum = umbrella, var.eff.size = vi)
+ 
+m9  <- robu(formula = final_e_size ~ 1 + fluency, data = dat2,
+             studynum = umbrella, var.eff.size = vi)
+
+m10 <- robu(formula = final_e_size ~ 1 + risk, data = dat2,
+             studynum = umbrella, var.eff.size = vi)
+
+m11 <- robu(formula = final_e_size ~ 1 + initial_timepoint + final_timepoint, data = dat2,
             studynum = umbrella, var.eff.size = vi)
 
 
-m11 <- robu(formula = final_e_size ~ 1 + ran_score, data = dat2,
-            studynum = umbrella, var.eff.size = vi)
-
-m12 <- robu(formula = final_e_size ~ 1 + ran_std, data = dat2,
-            studynum = umbrella, var.eff.size = vi)
-
-m13 <- robu(formula = final_e_size ~ 1 + ran_item_unique, data = dat2,
-            studynum = umbrella, var.eff.size = vi)
-
-m14 <- robu(formula = final_e_size ~ 1 + total_ran_items, data = dat2,
-            studynum = umbrella, var.eff.size = vi)
-
-m15 <- robu(formula = final_e_size ~ 1 + risk, data = dat2,
-            studynum = umbrella, var.eff.size = vi)
+m12 <- robu(formula = final_e_size ~ 1 + ran_alphanumeric + initial_timepoint, data = dat2,
+           studynum = umbrella, var.eff.size = vi)
 
 
-m16 <- robu(formula = final_e_size ~ 1 + efficiency, data = dat2,
-            studynum = umbrella, var.eff.size = vi)
+# 
+# 
+# m11 <- robu(formula = final_e_size ~ 1 + ran_score, data = dat2,
+#             studynum = umbrella, var.eff.size = vi)
+# 
+# m12 <- robu(formula = final_e_size ~ 1 + ran_std, data = dat2,
+#             studynum = umbrella, var.eff.size = vi)
+# 
+# m13 <- robu(formula = final_e_size ~ 1 + ran_item_unique, data = dat2,
+#             studynum = umbrella, var.eff.size = vi)
+# 
+# m14 <- robu(formula = final_e_size ~ 1 + total_ran_items, data = dat2,
+#             studynum = umbrella, var.eff.size = vi)
+# 
+# 
+# 
+# m16 <- robu(formula = final_e_size ~ 1 + efficiency, data = dat2,
+#             studynum = umbrella, var.eff.size = vi)
+# 
+# m17 <- robu(formula = final_e_size ~ 1 + connected, data = dat2,
+#             studynum = umbrella, var.eff.size = vi)
+# 
+# m0 <- robu(formula = final_e_size ~ 1 + published, data = dat2,
+#            studynum = umbrella, var.eff.size = vi)
+# 
+# m00 <- robu(formula = final_e_size ~ 1 + emailed, data = dat2,
+#             studynum = umbrella, var.eff.size = vi)
 
 
-m17 <- robu(formula = final_e_size ~ 1 + connected, data = dat2,
-            studynum = umbrella, var.eff.size = vi)
 
+
+
+for_table <- list(all_intercept, m1, m2, m3, m4)
+
+rtfTable <- function(l){
+  z <- data.frame()
+  for(i in 1:length(l)){
+    z1 <- data.frame(
+      model = format(l[[i]][["ml"]]),
+      n = l[[i]][["N"]],
+      k = l[[i]][["M"]],
+      i2 = l[[i]][["mod_info"]][["I.2"]],
+      type = "model")
+  z <- rbind(z, z1)  
+  }
+  
+  zz <- data.frame()
+  for(i in 1:length(l)){
+    zz1 <- data.frame(
+      model = format(l[[i]][["ml"]]),
+      reg = l[[i]][["reg_table"]],
+      type = "reg")
+    zz <- rbind(zz, zz1)
+  }
+  zzz <- full_join(z, zz, by = c("model", "type"))
+  df <- zzz[order(zzz$model),]
+  
+  #round all numeric columns
+  nums <- vapply(df, is.numeric, FUN.VALUE = logical(1))
+  df[,nums] <- round(df[,nums], digits = 2)
+  df$CI <- paste0("[", df$reg.CI.L, " ", df$reg.CI.U, "]")
+  df <- df %>%
+    select(-type, -reg.CI.L, -reg.CI.U, -reg.sig)
+  return(df)
+}
+
+output <- rtfTable(for_table)
+
+# output$reg.labels <- as.character(output$reg.labels)
+# output$model <- as.character(output$model)
+# output[output == "X.Intercept."] <- "Intercept"
+
+
+
+
+
+write.table(output, file = "test_table.txt", sep = ",", row.names = F, na = "", quote = F)
 
 
 
