@@ -1,4 +1,4 @@
-source("/Volumes/NortonLab/Longitudinal_RAN_Reading_Meta_Analysis/Meta_analysis_new_and_improved/R_Scripts/Analysis_scripts/Effect_size_reshaping_1_27_2020.R")
+source("/Volumes/NortonLab/Longitudinal_RAN_Reading_Meta_Analysis/Meta_analysis_new_and_improved/R_Scripts/OSF_Versions/effect_size_reshaping_osf.R")
 
 ############################## Analysis #################################
 library(metafor)
@@ -28,7 +28,7 @@ m2 <- robu(formula = final_e_size ~ 1 + ran_colors_objects, data = dat2,
            studynum = umbrella, var.eff.size = vi)
 
 m3 <- robu(formula = final_e_size ~ 1 + ran_letters_numbers, data = dat2,
-            studynum = umbrella, var.eff.size = vi)
+           studynum = umbrella, var.eff.size = vi)
 
 m4 <- robu(formula = final_e_size ~ 1 + total_ran_items + ran_item_unique, data = dat2,
            studynum = umbrella, var.eff.size = vi)
@@ -37,31 +37,31 @@ m5 <- robu(formula = final_e_size ~ 1 + ran_std, data = dat2,
            studynum = umbrella, var.eff.size = vi)
 
 m6 <- robu(formula = final_e_size ~ 1 + comprehension, data = dat2,
-          studynum = umbrella, var.eff.size = vi)
+           studynum = umbrella, var.eff.size = vi)
 
 m7 <- robu(formula = final_e_size ~ 1 + nonword_single, data = dat2,
-            studynum = umbrella, var.eff.size = vi)
- 
+           studynum = umbrella, var.eff.size = vi)
+
 m8 <- robu(formula = final_e_size ~ 1 + timed, data = dat2,
-            studynum = umbrella, var.eff.size = vi)
+           studynum = umbrella, var.eff.size = vi)
 
 m9 <- robu(formula = final_e_size ~ 1 + efficiency, data = dat2,
-            studynum = umbrella, var.eff.size = vi)
- 
+           studynum = umbrella, var.eff.size = vi)
+
 m10  <- robu(formula = final_e_size ~ 1 + fluency, data = dat2,
              studynum = umbrella, var.eff.size = vi)
 
 m11 <- robu(formula = final_e_size ~ 1 + risk, data = dat2,
-             studynum = umbrella, var.eff.size = vi)
+            studynum = umbrella, var.eff.size = vi)
 
 m12 <- robu(formula = final_e_size ~ 1 + initial_timepoint + final_timepoint, data = dat2,
             studynum = umbrella, var.eff.size = vi)
 
 m13 <- robu(formula = final_e_size ~ 1 + initial_timepoint - ran_alphanumeric, data = dat2,
-           studynum = umbrella, var.eff.size = vi)
+            studynum = umbrella, var.eff.size = vi)
 
 m14 <- robu(formula = final_e_size ~ 1 + latent_cor, data = dat2,
-           studynum = umbrella, var.eff.size = vi)
+            studynum = umbrella, var.eff.size = vi)
 
 
 
@@ -106,7 +106,7 @@ results_table <- function(l){
       k = l[[i]][["M"]],
       i2 = l[[i]][["mod_info"]][["I.2"]],
       type = "model")
-  z <- rbind(z, z1)  
+    z <- rbind(z, z1)  
   }
   
   zz <- data.frame()

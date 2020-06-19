@@ -1,8 +1,9 @@
-source("/Volumes/NortonLab/Longitudinal_RAN_Reading_Meta_Analysis/Meta_analysis_new_and_improved/R_Scripts/REDCap_sources/load_full_text_codes.R")
+library(tidyverse)
+dat <- read.csv("/Volumes/NortonLab/Longitudinal_RAN_Reading_Meta_Analysis/Meta_analysis_new_and_improved/REDCap_Data_exports/full_double_code_meta_analysis_data.csv")
 
 #filter for useable data from first coder (excludes training articles)
 effect_sizes <- dat %>%
-  filter((nousabledata == "Yes" | nousabledata == "No code-able effects, but authors emailed data") & measures_complete == "Complete") %>%
+  filter(nousabledata == "Yes" & measures_complete == "Complete") %>%
   filter(str_detect(record_id, pattern = "\\[1\\]$")) 
 
 #This function collapses the 44 composite checkbox reading measures to 1 variable for
@@ -15,9 +16,9 @@ composite.list <- function(x, nms){
   composite_vars <- c('WRMT Word ID', 'GORT Passage Score', 'GORT Rate', 'KTEA Reading Comprehension', 'KTEA Reading Decoding', 'BASIS Reading Comprehension', 'TOWRE Sight Word Efficiency (SWE)', 'TOWRE Phonemic Decoding Efficiency (PDE)','NARA Reading Comprehension (Accuracy)', 'NARA Reading Comprehension (Content)',  'YARC Word Reading', 'WRMT Word Attack', 'YARC Early Word Reading', 'Schonell Single Word Graded Reading Test',  'Primary Reading Test', 'PIAT', 'Gray Silent Reading Tests', 'Oral and Written Language Scales', 'QRI Fluency', 'QRI Comprehension', 'TOSWRF', 'TORC', 'WRMT Passage Comprehension',  'PAL', 'Gates-MacGinitie Reading Test', 'YARC Passage Reading', 'Unstandardized Picture-Word Matching Task', 'WRAT Reading', 'DIBELS Oral Reading Fluency', 'AIMSWeb Mazes', 'WJ Word Attack', 'NA', 'NA', 'WRMT Word Comprehension',  "NA", "NA", "WIAT Basic Reading", "California Achievement Test - Reading", "Other", 'WRMT Letter-Word ID', 'WJ Letter-Word ID', 'WJ Sentence Reading Fluency', 'WJ Passage Comprehension', 'Stanford Achievement Test Reading Comprehension')
   #composite_vars2 <-c('WRMT Word ID', 'WRMT Word Attack', 'WRMT Passage Comprehension', 'WRMT Word Comprehension', 'WRMT Letter-Word ID', 'WJ Letter-Word ID', 'WJ Sentence Reading Fluency', 'WJ Passage Comprehension', 'Stanford Achievement Test Reading Comprehension', 'GORT Passage Score', 'GORT Rate', 'KTEA Reading Comprehension', 'KTEA Reading Decoding', 'BASIS Reading Comprehension', 'TOWRE Sight Word Efficiency (SWE)', 'TOWRE Phonemic Decoding Efficiency (PDE)','NARA Reading Comprehension (Accuracy)', 'NARA Reading Comprehension (Content)',  'YARC Word Reading', 'YARC Early Word Reading', 'Schonell Single Word Graded Reading Test',  'Primary Reading Test', 'PIAT', 'Gray Silent Reading Tests', 'Oral and Written Language Scales', 'QRI Fluency', 'QRI Comprehension', 'TOSWRF', 'TORC', 'PAL', 'Gates-MacGinitie Reading Test', 'YARC Passage Reading', 'Unstandardized Picture-Word Matching Task', 'WRAT Reading', 'DIBELS Oral Reading Fluency', 'AIMSWeb Mazes', 'WJ Word Attack', 'NA', 'NA', "NA", "NA", "WIAT Basic Reading", "California Achievement Test - Reading", "Other")
   
-   x <- enframe(x) %>%
-     spread(key = "name", value = "value")
- 
+  x <- enframe(x) %>%
+    spread(key = "name", value = "value")
+  
   comp <- x %>%
     select(comprehension_composite_types___1:comprehension_composite_types___9)
   vec <- which(comp == "Checked")
@@ -143,10 +144,10 @@ effect_sizes$age_months_sd <- ifelse(effect_sizes$age_months_years == "Years", e
 
 #building citation from author and year variables
 effect_sizes$citation <- ifelse(str_count(effect_sizes$authors, ";") == 0, 
-                   (paste(word(effect_sizes$authors, 1), substr(effect_sizes$year, start = 1, stop = 4))), 
-                   ifelse(str_count(effect_sizes$authors, ";") == 1, paste0(str_extract(pattern = "[^,]*" , effect_sizes$authors), " & ", str_extract(pattern = regex("(?<=; ).*(?=,)"), effect_sizes$authors), ", ", substr(effect_sizes$year, start = 1, stop = 4)),
-                          paste(str_extract(pattern = "[^,]*" , effect_sizes$authors), "et al.,", substr(effect_sizes$year, start = 1, stop = 4))))
-  
+                                (paste(word(effect_sizes$authors, 1), substr(effect_sizes$year, start = 1, stop = 4))), 
+                                ifelse(str_count(effect_sizes$authors, ";") == 1, paste0(str_extract(pattern = "[^,]*" , effect_sizes$authors), " & ", str_extract(pattern = regex("(?<=; ).*(?=,)"), effect_sizes$authors), ", ", substr(effect_sizes$year, start = 1, stop = 4)),
+                                       paste(str_extract(pattern = "[^,]*" , effect_sizes$authors), "et al.,", substr(effect_sizes$year, start = 1, stop = 4))))
+
 effect_sizes <- effect_sizes %>%
   select(record_id, citation, umbrella, total_n, 
          initial_timepoint_to_code, gradeschool_timepoint_to_code,
@@ -162,45 +163,45 @@ effect_sizes$flip <- ifelse(effect_sizes$flip == T, -1, 1)
 
 
 effect_sizes$initial_timepoint <- ifelse(effect_sizes$initial_timepoint_to_code == "Preschool/Reception (UK) Fall", 0, 
-                                  ifelse(effect_sizes$initial_timepoint_to_code == "Preschool/Reception (UK) Spring", 6,
-                                  ifelse(effect_sizes$initial_timepoint_to_code == "Kindergarten/(UK/AUS Year 1) Fall", 12,
-                                  ifelse(effect_sizes$initial_timepoint_to_code == "Kindergarten/(UK/AUS Year 1) Spring", 18,
-                                  ifelse(effect_sizes$initial_timepoint_to_code == "Kindergarten/(UK/AUS Year 1) (time unclear)", 15,
-                                  ifelse(effect_sizes$initial_timepoint_to_code == "Preschool/Reception (UK) (time unclear)", 3,
-                                  ifelse(effect_sizes$initial_timepoint_to_code == "Mixed Preschool and Kindergarten (time unclear)", 9, no = -9999
-                                         )))))))
+                                         ifelse(effect_sizes$initial_timepoint_to_code == "Preschool/Reception (UK) Spring", 6,
+                                                ifelse(effect_sizes$initial_timepoint_to_code == "Kindergarten/(UK/AUS Year 1) Fall", 12,
+                                                       ifelse(effect_sizes$initial_timepoint_to_code == "Kindergarten/(UK/AUS Year 1) Spring", 18,
+                                                              ifelse(effect_sizes$initial_timepoint_to_code == "Kindergarten/(UK/AUS Year 1) (time unclear)", 15,
+                                                                     ifelse(effect_sizes$initial_timepoint_to_code == "Preschool/Reception (UK) (time unclear)", 3,
+                                                                            ifelse(effect_sizes$initial_timepoint_to_code == "Mixed Preschool and Kindergarten (time unclear)", 9, no = -9999
+                                                                            )))))))
 
 effect_sizes$init_text <- ifelse(effect_sizes$initial_timepoint_to_code %in% c("Preschool/Reception (UK) Fall", "Preschool/Reception (UK) Spring", "Preschool/Reception (UK) (time unclear)"), "Pre-K", 
-                          ifelse(effect_sizes$initial_timepoint_to_code %in% c("Kindergarten/(UK/AUS Year 1) Fall", "Kindergarten/(UK/AUS Year 1) Spring", "Kindergarten/(UK/AUS Year 1) (time unclear)"), "K",
-                          ifelse(effect_sizes$initial_timepoint_to_code == "Mixed Preschool and Kindergarten (time unclear)", "Mixed", no = -9999
-                          )))
-  
+                                 ifelse(effect_sizes$initial_timepoint_to_code %in% c("Kindergarten/(UK/AUS Year 1) Fall", "Kindergarten/(UK/AUS Year 1) Spring", "Kindergarten/(UK/AUS Year 1) (time unclear)"), "K",
+                                        ifelse(effect_sizes$initial_timepoint_to_code == "Mixed Preschool and Kindergarten (time unclear)", "Mixed", no = -9999
+                                        )))
+
 
 
 effect_sizes$final_timepoint <- ifelse(effect_sizes$gradeschool_timepoint_to_code == "Fall Grade 1 (US) / Fall Grade 2 (UK)", 24, 
-                                  ifelse(effect_sizes$gradeschool_timepoint_to_code == "Spring Grade 1 (US) / Spring Grade 2 (UK)", 30,
-                                  ifelse(effect_sizes$gradeschool_timepoint_to_code == "Fall Grade 2 (US) / Fall Grade 3 (UK)", 36,
-                                  ifelse(effect_sizes$gradeschool_timepoint_to_code == "Spring Grade 2 (US) / Spring Grade 3 (UK)", 42,
-                                  ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Fall Grade 3 (US) / Fall Grade 4 (UK)', 48,
-                                  ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Spring Grade 3 (US) / Spring Grade 4 (UK)', 54,
-                                  ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Fall Grade 4 (US) / Fall Grade 5 (UK)', 60,
-                                  ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Spring Grade 4 (US) / Spring Grade 5 (UK)' , 66,
-                                  ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Fall Grade 5 (US) / Fall Grade 6 (UK)' , 72,
-                                  ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Spring Grade 5 (US) / Spring Grade 6 (UK)', 78,
-                                  ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Grade 1 (NOS) (US) / Year 2 (UK)', 27,
-                                  ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Grade 2 (NOS) (US) / Year 3 (UK)', 39,  
-                                  ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Grade 3 (NOS) (US) / Year 4 (UK)', 51,
-                                  ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Grade 4 (NOS) (US) / Year 5 (UK)', 63,  
-                                  ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Grade 5 (NOS) (US) / Year 6 (UK)', 75, no = -99
-                                          )))))))))))))))
+                                       ifelse(effect_sizes$gradeschool_timepoint_to_code == "Spring Grade 1 (US) / Spring Grade 2 (UK)", 30,
+                                              ifelse(effect_sizes$gradeschool_timepoint_to_code == "Fall Grade 2 (US) / Fall Grade 3 (UK)", 36,
+                                                     ifelse(effect_sizes$gradeschool_timepoint_to_code == "Spring Grade 2 (US) / Spring Grade 3 (UK)", 42,
+                                                            ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Fall Grade 3 (US) / Fall Grade 4 (UK)', 48,
+                                                                   ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Spring Grade 3 (US) / Spring Grade 4 (UK)', 54,
+                                                                          ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Fall Grade 4 (US) / Fall Grade 5 (UK)', 60,
+                                                                                 ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Spring Grade 4 (US) / Spring Grade 5 (UK)' , 66,
+                                                                                        ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Fall Grade 5 (US) / Fall Grade 6 (UK)' , 72,
+                                                                                               ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Spring Grade 5 (US) / Spring Grade 6 (UK)', 78,
+                                                                                                      ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Grade 1 (NOS) (US) / Year 2 (UK)', 27,
+                                                                                                             ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Grade 2 (NOS) (US) / Year 3 (UK)', 39,  
+                                                                                                                    ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Grade 3 (NOS) (US) / Year 4 (UK)', 51,
+                                                                                                                           ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Grade 4 (NOS) (US) / Year 5 (UK)', 63,  
+                                                                                                                                  ifelse(effect_sizes$gradeschool_timepoint_to_code == 'Grade 5 (NOS) (US) / Year 6 (UK)', 75, no = -99
+                                                                                                                                  )))))))))))))))
 
 
 effect_sizes$final_text <- ifelse(effect_sizes$gradeschool_timepoint_to_code %in% c("Fall Grade 1 (US) / Fall Grade 2 (UK)", "Spring Grade 1 (US) / Spring Grade 2 (UK)", 'Grade 1 (NOS) (US) / Year 2 (UK)'), "Grade 1", 
-                           ifelse(effect_sizes$gradeschool_timepoint_to_code %in% c("Fall Grade 2 (US) / Fall Grade 3 (UK)", "Spring Grade 2 (US) / Spring Grade 3 (UK)", 'Grade 2 (NOS) (US) / Year 3 (UK)'), "Grade 2",
-                           ifelse(effect_sizes$gradeschool_timepoint_to_code %in% c("Fall Grade 3 (US) / Fall Grade 4 (UK)", "Spring Grade 3 (US) / Spring Grade 4 (UK)", 'Grade 3 (NOS) (US) / Year 4 (UK)'), "Grade 3",
-                           ifelse(effect_sizes$gradeschool_timepoint_to_code %in% c("Fall Grade 4 (US) / Fall Grade 5 (UK)", "Spring Grade 4 (US) / Spring Grade 5 (UK)", 'Grade 4 (NOS) (US) / Year 5 (UK)'), "Grade 4",
-                           ifelse(effect_sizes$gradeschool_timepoint_to_code %in% c("Fall Grade 5 (US) / Fall Grade 6 (UK)", "Spring Grade 5 (US) / Spring Grade 6 (UK)", 'Grade 5 (NOS) (US) / Year 6 (UK)'), "Grade 5", no = -99
-                           )))))
+                                  ifelse(effect_sizes$gradeschool_timepoint_to_code %in% c("Fall Grade 2 (US) / Fall Grade 3 (UK)", "Spring Grade 2 (US) / Spring Grade 3 (UK)", 'Grade 2 (NOS) (US) / Year 3 (UK)'), "Grade 2",
+                                         ifelse(effect_sizes$gradeschool_timepoint_to_code %in% c("Fall Grade 3 (US) / Fall Grade 4 (UK)", "Spring Grade 3 (US) / Spring Grade 4 (UK)", 'Grade 3 (NOS) (US) / Year 4 (UK)'), "Grade 3",
+                                                ifelse(effect_sizes$gradeschool_timepoint_to_code %in% c("Fall Grade 4 (US) / Fall Grade 5 (UK)", "Spring Grade 4 (US) / Spring Grade 5 (UK)", 'Grade 4 (NOS) (US) / Year 5 (UK)'), "Grade 4",
+                                                       ifelse(effect_sizes$gradeschool_timepoint_to_code %in% c("Fall Grade 5 (US) / Fall Grade 6 (UK)", "Spring Grade 5 (US) / Spring Grade 6 (UK)", 'Grade 5 (NOS) (US) / Year 6 (UK)'), "Grade 5", no = -99
+                                                       )))))
 
 
 
@@ -216,7 +217,7 @@ effect_sizes$timespan <- paste0(effect_sizes$init_text, "-to-", effect_sizes$fin
 
 effect_sizes$risk <- ifelse(effect_sizes$sample_type %in% c("School-based sample", "Not specified", "Control Group (typical/good PA/No-Risk Group)", "Gifted"), "Low Risk",
                             ifelse(effect_sizes$sample_type == "Oversampled for dyslexia, but has lots of typicals as well", "Medium Risk", 
-                            ifelse(effect_sizes$sample_type %in% c("Dyslexia Group (retroactive classification)", "Only dyslexia-risk"), "High Risk", NA
+                                   ifelse(effect_sizes$sample_type %in% c("Dyslexia Group (retroactive classification)", "Only dyslexia-risk"), "High Risk", NA
                                    )))
 effect_sizes$risk <- factor(effect_sizes$risk)
 
@@ -299,8 +300,6 @@ effect_sizes_long <- full_join(effect_sizes_long, effect_sizes_long_11cor)
 
 
 
-
-
 #make RAN variables less ugly, more human readable for tables
 effect_sizes_long$ran_type <- gsub("e_size_ran_n.*", "Numbers", x = effect_sizes_long$ran_type)
 effect_sizes_long$ran_type <- gsub("e_size_ran_c_.*", "Colors", x = effect_sizes_long$ran_type)
@@ -311,20 +310,9 @@ effect_sizes_long$ran_type <- gsub(".*e_size_ran_composite_.*", "Composite", x =
 effect_sizes_long$ran_type <- gsub(".*e_size_ran_composite2_.*", "Composite 2", x = effect_sizes_long$ran_type)
 
 effect_sizes_long$ran_type <- ifelse(effect_sizes_long$ran_type == "Composite", effect_sizes_long$ran_composite,
-                              ifelse(effect_sizes_long$ran_type == "Composite 2", effect_sizes_long$ran_composite_2, effect_sizes_long$ran_type))
+                                     ifelse(effect_sizes_long$ran_type == "Composite 2", effect_sizes_long$ran_composite_2, effect_sizes_long$ran_type))
 
 effect_sizes_long$ran_type <- ifelse(effect_sizes_long$ran_type == "RAN Composite: Objects", "Objects", effect_sizes_long$ran_type)
-
-#Kirby hand input
-effect_sizes_long$ran_item_unique[which(effect_sizes_long$record_id == "Kirby Data, 2011 [1]" & effect_sizes_long$ran_type == "Objects")] <- 6
-effect_sizes_long$total_ran_items[which(effect_sizes_long$record_id == "Kirby Data, 2011 [1]" & effect_sizes_long$ran_type == "Objects")] <- 36
-effect_sizes_long$ran_std[which(effect_sizes_long$record_id == "Kirby Data, 2011 [1]" & effect_sizes_long$ran_type == "Objects")] <- "Yes"
-
-
-effect_sizes_long$ran_item_unique[which(effect_sizes_long$record_id == "Kirby Data, 2011 [1]" & effect_sizes_long$ran_type == "Colors")] <- 5
-effect_sizes_long$total_ran_items[which(effect_sizes_long$record_id == "Kirby Data, 2011 [1]" & effect_sizes_long$ran_type == "Colors")] <- 50
-effect_sizes_long$ran_std[which(effect_sizes_long$record_id == "Kirby Data, 2011 [1]" & effect_sizes_long$ran_type == "Colors")] <- "No"
-
 
 #Composite: 
 effect_sizes_long$total_ran_items_mult <- ifelse(!str_detect(effect_sizes_long$ran_type, "Composite:"), 1, 
@@ -348,7 +336,7 @@ effect_sizes_long$ran_colors_objects <- ifelse(effect_sizes_long$ran_type == "Co
                                                ifelse(effect_sizes_long$ran_type == "Objects", "Objects", NA))
 
 effect_sizes_long$ran_letters_numbers <- ifelse(effect_sizes_long$ran_type == "Letters", "Letters", 
-                                               ifelse(effect_sizes_long$ran_type == "Numbers", "Numbers", NA))
+                                                ifelse(effect_sizes_long$ran_type == "Numbers", "Numbers", NA))
 
 
 
@@ -381,10 +369,10 @@ effect_sizes_long$reading_measure <- ifelse(effect_sizes_long$reading_measure ==
 
 #composite list replaces "Decoding Composite"
 effect_sizes_long$reading_measure <- case_when(effect_sizes_long$reading_measure == "Comprehension Composite" ~ effect_sizes_long$comprehension_composite,
-                                                    effect_sizes_long$reading_measure == "Decoding Composite" ~ effect_sizes_long$decoding_composite,
-                                                    effect_sizes_long$reading_measure == "General Reading Composite" ~ effect_sizes_long$gen_reading_composite,
-                                                    effect_sizes_long$reading_measure == "Fluency Composite" ~ effect_sizes_long$fluency_composite,
-                                                    !effect_sizes_long$reading_measure %in% c("Fluency Composite", "General Reading Composite", "Decoding Composite", "Comprehension Composite") ~ effect_sizes_long$reading_measure)
+                                               effect_sizes_long$reading_measure == "Decoding Composite" ~ effect_sizes_long$decoding_composite,
+                                               effect_sizes_long$reading_measure == "General Reading Composite" ~ effect_sizes_long$gen_reading_composite,
+                                               effect_sizes_long$reading_measure == "Fluency Composite" ~ effect_sizes_long$fluency_composite,
+                                               !effect_sizes_long$reading_measure %in% c("Fluency Composite", "General Reading Composite", "Decoding Composite", "Comprehension Composite") ~ effect_sizes_long$reading_measure)
 
 
 ##umbrella studies
@@ -400,9 +388,6 @@ effect_sizes_long$emailed <- ifelse(effect_sizes_long$publication == "Other unpu
 x <- readxl::read_xlsx("/Volumes/NortonLab/Longitudinal_RAN_Reading_Meta_Analysis/Meta_analysis_new_and_improved/Reading Measures/Reading Measures Meta Analysis.xlsx")
 x <- x %>% select(-notes, -notes2, -described)
 x[x == "NA"] <- NA
-
-#remove Caravolas 2019 t2 reading measures (too young)
-x <- x %>% filter(!reading_measure %in% c("Word Reading", "Nonword Reading"))
 
 x$nonword_single <- ifelse((x$real_word == "nonword" & x$connected == "single word" & x$comprehension == "not"), "Nonword", 
                            ifelse((x$real_word == "word" & x$connected == "single word" & x$comprehension == "not"), "Word", NA))
