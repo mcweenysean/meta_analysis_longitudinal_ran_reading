@@ -326,11 +326,40 @@ effect_sizes_long$total_ran_items[which(effect_sizes_long$record_id == "Kirby Da
 effect_sizes_long$ran_std[which(effect_sizes_long$record_id == "Kirby Data, 2011 [1]" & effect_sizes_long$ran_type == "Colors")] <- "No"
 
 
+#Catts 1993 hand input
+effect_sizes_long$ran_item_unique[which((effect_sizes_long$record_id == "Catts, 1993; The relationship bet [1]" | effect_sizes_long$record_id == "[S] Catts, 1991; early identification [1]") & effect_sizes_long$ran_type == "Colored Animals")] <- 9
+effect_sizes_long$ran_item_unique[which((effect_sizes_long$record_id == "Catts, 1993; The relationship bet [1]" | effect_sizes_long$record_id == "[S] Catts, 1991; early identification [1]") & !effect_sizes_long$ran_type == "Colored Animals")] <- 5
+
+effect_sizes_long$total_ran_items[which((effect_sizes_long$record_id == "Catts, 1993; The relationship bet [1]" | effect_sizes_long$record_id == "[S] Catts, 1991; early identification [1]") & effect_sizes_long$ran_type == "Colored Animals")] <- 24
+effect_sizes_long$total_ran_items[which((effect_sizes_long$record_id == "Catts, 1993; The relationship bet [1]" | effect_sizes_long$record_id == "[S] Catts, 1991; early identification [1]") & !effect_sizes_long$ran_type == "Colored Animals")] <- 50
+
+#Inoue  
+effect_sizes_long$ran_item_unique[which((effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Dec) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Fluency) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 3 - Comp) [1]") & effect_sizes_long$ran_type == "Colors")] <- 6
+effect_sizes_long$ran_item_unique[which((effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Dec) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Fluency) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 3 - Comp) [1]") & effect_sizes_long$ran_type == "Objects")] <- 5
+
+effect_sizes_long$total_ran_items[which((effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Dec) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Fluency) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 3 - Comp) [1]") & effect_sizes_long$ran_type == "Colors")] <- 36
+effect_sizes_long$ran_item_unique[which((effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Dec) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Fluency) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 3 - Comp) [1]") & effect_sizes_long$ran_type == "Objects")] <- 50
+
+effect_sizes_long$ran_array_num[which((effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Dec) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Fluency) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 3 - Comp) [1]") & effect_sizes_long$ran_type == "Colors")] <- 2
+effect_sizes_long$ran_array_num[which((effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Dec) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Fluency) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 3 - Comp) [1]") & effect_sizes_long$ran_type == "Objects")] <- 1
+
+effect_sizes_long$ran_std[which((effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Dec) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Fluency) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 3 - Comp) [1]") & effect_sizes_long$ran_type == "Colors")] <- "Yes"
+effect_sizes_long$ran_std[which((effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Dec) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Fluency) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 3 - Comp) [1]") & effect_sizes_long$ran_type == "Objects")] <- "No"
+
+
+#
+
+
+
 #Composite: 
 effect_sizes_long$total_ran_items_mult <- ifelse(!str_detect(effect_sizes_long$ran_type, "Composite:"), 1, 
                                                  ifelse(str_detect(effect_sizes_long$ran_type, pattern = regex(",.*,.*,")), 4, 
                                                         ifelse(str_detect(effect_sizes_long$ran_type, pattern = regex(",.*,")), 3, 
                                                                ifelse(str_detect(effect_sizes_long$ran_type, pattern = regex(",")), 2, 1))))
+
+#macdonald had 2 objects measures, so 3 should be multiplier
+effect_sizes_long$total_ran_items_mult[which(effect_sizes_long$record_id == "Macdonald, 2013; Multivariate screeni [1]")] <- 3
+
 
 effect_sizes_long$total_ran_items <- effect_sizes_long$total_ran_items * effect_sizes_long$total_ran_items_mult 
 
@@ -352,7 +381,7 @@ effect_sizes_long$ran_letters_numbers <- ifelse(effect_sizes_long$ran_type == "L
 
 
 
-effect_sizes_long$ran_comp <- ifelse(str_detect(effect_sizes_long$ran_type, "Composite"), "Composite", "NotComposite")
+effect_sizes_long$ran_comp <- ifelse(str_detect(effect_sizes_long$ran_type, regex("Composite: .*")), "Composite", "NotComposite")
 
 
 #Wolf, 1986 Single Word Reading Task flip - last observation
