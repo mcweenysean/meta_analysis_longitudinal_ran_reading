@@ -1,4 +1,4 @@
-source("/Volumes/NortonLab/Longitudinal_RAN_Reading_Meta_Analysis/Meta_analysis_new_and_improved/R_Scripts/OSF_Versions/effect_size_reshaping_osf.R")
+source("/Volumes/XXXXX/Longitudinal_RAN_Reading_Meta_Analysis/Meta_analysis_new_and_improved/R_Scripts/OSF_Versions/effect_size_reshaping_osf.R")
 
 ############################## Analysis #################################
 library(metafor)
@@ -85,8 +85,8 @@ m14 <- robu(formula = final_e_size ~ 1 + latent_cor, data = dat2,
 # m17 <- robu(formula = final_e_size ~ 1 + connected, data = dat2,
 #             studynum = umbrella, var.eff.size = vi)
 # 
-# m0 <- robu(formula = final_e_size ~ 1 + published, data = dat2,
-#             studynum = umbrella, var.eff.size = vi)
+m0 <- robu(formula = final_e_size ~ 1 + published, data = dat2,
+           studynum = umbrella, var.eff.size = vi)
 # # 
 # m00 <- robu(formula = final_e_size ~ 1 + emailed, data = dat2,
 #              studynum = umbrella, var.eff.size = vi)

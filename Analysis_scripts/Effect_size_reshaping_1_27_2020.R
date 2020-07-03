@@ -153,7 +153,7 @@ effect_sizes <- effect_sizes %>%
          ran_colors_initial:ran_composite2_initial, ran_score, ran_alt, total_ran_items, ran_std, ran_item_num, ran_item_unique, ran_array_num,
          reading_measure_1:reading_measure_11_other,
          e_size_ran_c_rm1:measures_complete, comprehension_composite:ran_composite_2,
-         age_months, age_months_sd, sample_type, publication) %>%
+         age_months, age_months_sd, sample_type, publication, title) %>%
   mutate(flip = ran_score %in% c("Standard Score", "Rate (Items/Time)", "Raw Score (Time) but the correlation is an absolute value", "Not Reported/Unclear (positive correlation)"))
 
 #change "flip" from boolean to 1 or -1 to multiply effect sizes by
@@ -338,7 +338,7 @@ effect_sizes_long$ran_item_unique[which((effect_sizes_long$record_id == "Inoue, 
 effect_sizes_long$ran_item_unique[which((effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Dec) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Fluency) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 3 - Comp) [1]") & effect_sizes_long$ran_type == "Objects")] <- 5
 
 effect_sizes_long$total_ran_items[which((effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Dec) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Fluency) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 3 - Comp) [1]") & effect_sizes_long$ran_type == "Colors")] <- 36
-effect_sizes_long$ran_item_unique[which((effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Dec) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Fluency) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 3 - Comp) [1]") & effect_sizes_long$ran_type == "Objects")] <- 50
+effect_sizes_long$total_ran_items[which((effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Dec) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Fluency) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 3 - Comp) [1]") & effect_sizes_long$ran_type == "Objects")] <- 50
 
 effect_sizes_long$ran_array_num[which((effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Dec) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Fluency) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 3 - Comp) [1]") & effect_sizes_long$ran_type == "Colors")] <- 2
 effect_sizes_long$ran_array_num[which((effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Dec) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 1 - Fluency) [1]" | effect_sizes_long$record_id == "Inoue, 2018; Examining an Extende (Grade 3 - Comp) [1]") & effect_sizes_long$ran_type == "Objects")] <- 1
@@ -439,6 +439,7 @@ x$nonword_single <- ifelse((x$real_word == "nonword" & x$connected == "single wo
 x$efficiency <- ifelse((x$connected == "single word" & x$timed == "timed" & x$comprehension == "not" & x$fluency == "no"), "efficiency",
                        ifelse((x$connected == "single word" & x$timed == "not timed" & x$comprehension == "not" & x$fluency == "no"), "accuracy", NA))
 
+x$comprehension <- str_replace(x$comprehension, "comprehension", "yes_comprehension")
 
 
 effect_sizes_long <- full_join(effect_sizes_long, x, by = "reading_measure")
@@ -451,7 +452,7 @@ rm(esize2, esize3, effect_sizes_long_1cor, effect_sizes_long_2cor, effect_sizes_
 
 #select all variables that may be included in final analyses
 effect_sizes_long_full <- effect_sizes_long %>%
-  select(record_id, citation, umbrella, 
+  select(record_id, citation, umbrella, title,
          total_n, published, emailed, age_months, age_months_sd, sample_type, risk, timelapse, timespan, initial_timepoint, final_timepoint, init_text, final_text, latent_cor,
          ran_score, ran_item_unique, ran_std, ran_array_num, ran_alt, total_ran_items, ran_alphanumeric, ran_colors_objects, ran_comp, ran_letters_numbers,
          reading_measure, reading_measure_other, comprehension_composite, decoding_composite, fluency_composite, gen_reading_composite, ran_type, 

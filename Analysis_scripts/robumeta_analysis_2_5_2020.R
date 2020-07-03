@@ -6,6 +6,7 @@ library(robumeta)
 #library(clubSandwich)
 
 dat2 <- escalc(measure="ZCOR", ri=cor, ni=total_n, data=effect_sizes_long_full, slab=umbrella) 
+dat2$n_char <- as.character(dat2$total_n)
 
 dat2$sda <- sqrt(dat2$vi)
 
@@ -64,7 +65,15 @@ m14 <- robu(formula = final_e_size ~ 1 + latent_cor, data = dat2,
            studynum = umbrella, var.eff.size = vi)
 
 
+m15 <- robu(formula = final_e_size ~ 1 + ran_alphanumeric - initial_timepoint, data = dat2,
+            studynum = umbrella, var.eff.size = vi)
 
+
+dat4 <- dat2 %>% 
+  filter(!ran_item_unique >= 20)
+
+m16 <- robu(formula = final_e_size ~ 1 + total_ran_items + ran_item_unique, data = dat4,
+        studynum = umbrella, var.eff.size = vi)
 
 
 
@@ -85,8 +94,8 @@ m14 <- robu(formula = final_e_size ~ 1 + latent_cor, data = dat2,
 # m17 <- robu(formula = final_e_size ~ 1 + connected, data = dat2,
 #             studynum = umbrella, var.eff.size = vi)
 # 
-# m0 <- robu(formula = final_e_size ~ 1 + published, data = dat2,
-#             studynum = umbrella, var.eff.size = vi)
+m0 <- robu(formula = final_e_size ~ 1 + published, data = dat2,
+            studynum = umbrella, var.eff.size = vi)
 # # 
 # m00 <- robu(formula = final_e_size ~ 1 + emailed, data = dat2,
 #              studynum = umbrella, var.eff.size = vi)
@@ -141,7 +150,7 @@ output <- results_table(for_table)
 
 
 dev.off()
-forest.robu(all_intercept, es.lab = "citation", study.lab = "umbrella",
+forest.robu(all_intercept, es.lab = "citation", study.lab = "umbrella", "n" = n_char,
             "r" = flip_cor, "RAN_Type" = ran_type, "Reading Measure" = reading_measure, 
             "Length" = timespan)
 

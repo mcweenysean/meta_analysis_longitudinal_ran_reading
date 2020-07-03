@@ -1,4 +1,4 @@
-source("/Volumes/NortonLab/Longitudinal_RAN_Reading_Meta_Analysis/Meta_analysis_new_and_improved/R_Scripts/OSF_Versions/effect_size_reshaping_osf.R")
+source("/Volumes/XXXX/Longitudinal_RAN_Reading_Meta_Analysis/Meta_analysis_new_and_improved/R_Scripts/OSF_Versions/effect_size_reshaping_osf.R")
 library(psych)
 
 summary_stats <- effect_sizes_long_full %>%
@@ -9,6 +9,13 @@ summary_stats <- effect_sizes_long_full %>%
 
 (desc <- describe(summary_stats[,2:ncol(summary_stats)], na.rm = T))
 paste0("The sample (n = ", n, ") was drawn from ", max(desc$n), " independent samples across 68 papers. For studies that reported an initial age, the mean initial age was ", round(desc$mean[2], 2),  " months with a mean SD of ", round(desc$mean[3], 2), ". The mean interval between initial and final timepoints was ", round(desc$mean[4], 2), " months, which is consistent with our prioritization of the Grade 2 timepoint.")
+
+
+u <- effect_sizes_long_full %>%
+  group_by(umbrella) %>%
+  filter(!is.na(ran_item_unique)) %>%
+  select(ran_item_unique)
+mean(u$ran_item_unique)
 
 
 # Descriptives for categoricals
@@ -44,7 +51,6 @@ n_per(ran_std, "No")
 n_per(risk, "Low Risk")
 n_per(risk, "Medium Risk")
 n_per(risk, "High Risk")
-
 n_per(ran_alphanumeric, "Non-alphanumeric")
 n_per(ran_alphanumeric, "Alphanumeric")
 
@@ -83,4 +89,8 @@ n_per_numeric <- function(var){
 
 n_per_numeric(total_ran_items)
 n_per_numeric(ran_item_unique)
+
+
+effect_sizes_long_full %>% group_by(title) %>% 
+  slice(1) %>% select(umbrella, title)
 

@@ -90,3 +90,10 @@ n_per_numeric <- function(var){
 n_per_numeric(total_ran_items)
 n_per_numeric(ran_item_unique)
 
+
+effect_sizes_long_full %>% group_by(title) %>% 
+  slice(1) %>% select(umbrella, title)
+  
+  
+
+
