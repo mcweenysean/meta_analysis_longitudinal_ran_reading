@@ -1,4 +1,9 @@
-source("/Volumes/NortonLab/Longitudinal_RAN_Reading_Meta_Analysis/Meta_analysis_new_and_improved/R_Scripts/REDCap_sources/load_full_text_codes.R")
+if (.Platform$OS.type == "windows") {
+  source("Z:\\Longitudinal_RAN_Reading_Meta_Analysis\\Meta_analysis_new_and_improved\\R_Scripts\\REDCap_sources\\load_full_text_codes.R")
+} else {
+  source("/Volumes/NortonLab/Longitudinal_RAN_Reading_Meta_Analysis/Meta_analysis_new_and_improved/R_Scripts/REDCap_sources/load_full_text_codes.R")
+}
+
 
 #filter for useable data from first coder (excludes training articles)
 effect_sizes <- dat %>%
@@ -148,7 +153,7 @@ effect_sizes$citation <- ifelse(str_count(effect_sizes$authors, ";") == 0,
                           paste(str_extract(pattern = "[^,]*" , effect_sizes$authors), "et al.,", substr(effect_sizes$year, start = 1, stop = 4))))
   
 effect_sizes <- effect_sizes %>%
-  select(record_id, citation, umbrella, total_n, 
+  select(record_id, citation, umbrella, total_n, country,
          initial_timepoint_to_code, gradeschool_timepoint_to_code,
          ran_colors_initial:ran_composite2_initial, ran_score, ran_alt, total_ran_items, ran_std, ran_item_num, ran_item_unique, ran_array_num,
          reading_measure_1:reading_measure_11_other,
@@ -424,9 +429,15 @@ effect_sizes_long$umbrella <- ifelse(is.na(effect_sizes_long$umbrella), effect_s
 effect_sizes_long$published <- ifelse(effect_sizes_long$publication %in% c("Other unpublished data", "Unpublished dissertation or thesis"), "Unpublished", "Published")
 effect_sizes_long$emailed <- ifelse(effect_sizes_long$publication == "Other unpublished data", "Emailed", "Not emailed")
 
+#dissertation
+effect_sizes_long$dissertation <- ifelse(effect_sizes_long$publication == "Unpublished dissertation or thesis", "Thesis", "Not Thesis")
 
+if (.Platform$OS.type == "windows"){
+  x <- readxl::read_xlsx("Z:\\Longitudinal_RAN_Reading_Meta_Analysis\\Meta_analysis_new_and_improved\\Reading Measures\\Reading Measures Meta Analysis.xlsx")  
+} else {
+  x <- readxl::read_xlsx("/Volumes/NortonLab/Longitudinal_RAN_Reading_Meta_Analysis/Meta_analysis_new_and_improved/Reading Measures/Reading Measures Meta Analysis.xlsx")
+}
 
-x <- readxl::read_xlsx("/Volumes/NortonLab/Longitudinal_RAN_Reading_Meta_Analysis/Meta_analysis_new_and_improved/Reading Measures/Reading Measures Meta Analysis.xlsx")
 x <- x %>% select(-notes, -notes2, -described)
 x[x == "NA"] <- NA
 
@@ -452,8 +463,8 @@ rm(esize2, esize3, effect_sizes_long_1cor, effect_sizes_long_2cor, effect_sizes_
 
 #select all variables that may be included in final analyses
 effect_sizes_long_full <- effect_sizes_long %>%
-  select(record_id, citation, umbrella, title,
-         total_n, published, emailed, age_months, age_months_sd, sample_type, risk, timelapse, timespan, initial_timepoint, final_timepoint, init_text, final_text, latent_cor,
+  select(record_id, citation, umbrella, title, country,
+         total_n, published, dissertation, emailed, age_months, age_months_sd, sample_type, risk, timelapse, timespan, initial_timepoint, final_timepoint, init_text, final_text, latent_cor,
          ran_score, ran_item_unique, ran_std, ran_array_num, ran_alt, total_ran_items, ran_alphanumeric, ran_colors_objects, ran_comp, ran_letters_numbers,
          reading_measure, reading_measure_other, comprehension_composite, decoding_composite, fluency_composite, gen_reading_composite, ran_type, 
          timed, real_word, connected, comprehension, fluency, nonword_single, efficiency,
@@ -517,3 +528,4 @@ effect_sizes_long_full <- effect_sizes_long %>%
 #                                            ifelse(effect_sizes_long_full$reading_measure %in% passage | str_detect(effect_sizes_long_full$reading_measure, "Reading Comprehension Composite"), "Connected Text", 
 #                                                   ifelse(effect_sizes_long_full$reading_measure %in% both, NA, NA)))
 # # 
+

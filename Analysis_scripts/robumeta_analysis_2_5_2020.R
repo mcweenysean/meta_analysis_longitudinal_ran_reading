@@ -1,4 +1,8 @@
-source("/Volumes/NortonLab/Longitudinal_RAN_Reading_Meta_Analysis/Meta_analysis_new_and_improved/R_Scripts/Analysis_scripts/Effect_size_reshaping_1_27_2020.R")
+if (.Platform$OS.type == "windows") {
+  source("Z:\\Longitudinal_RAN_Reading_Meta_Analysis\\Meta_analysis_new_and_improved\\R_Scripts\\Analysis_scripts\\Effect_size_reshaping_1_27_2020.R")
+  } else {
+  source("/Volumes/NortonLab/Longitudinal_RAN_Reading_Meta_Analysis/Meta_analysis_new_and_improved/R_Scripts/Analysis_scripts/Effect_size_reshaping_1_27_2020.R")
+}
 
 ############################## Analysis #################################
 library(metafor)
@@ -20,7 +24,16 @@ print(all_intercept)
 fisherz2r(all_intercept[["b.r"]])
 
 
+all_intercept_no_latent <- robu(formula = final_e_size ~ 1, data = dat2 %>% filter(latent_cor == "No"), modelweights = "CORR",
+                                studynum = umbrella, var.eff.size = vi)
 
+fisherz2r(all_intercept_no_latent[["b.r"]])
+
+
+
+
+# m0 <- robu(formula = final_e_size ~ 1 + dissertation, data = dat2,
+#            studynum = umbrella, var.eff.size = vi)
 
 m1 <- robu(formula = final_e_size ~ 1 + ran_alphanumeric, data = dat2,
            studynum = umbrella, var.eff.size = vi)
@@ -31,7 +44,7 @@ m2 <- robu(formula = final_e_size ~ 1 + ran_colors_objects, data = dat2,
 m3 <- robu(formula = final_e_size ~ 1 + ran_letters_numbers, data = dat2,
             studynum = umbrella, var.eff.size = vi)
 
-m4 <- robu(formula = final_e_size ~ 1 + total_ran_items + ran_item_unique, data = dat2,
+m4 <- robu(formula = final_e_size ~ 1 + total_ran_items + ran_item_unique, data = dat2 %>% filter(!record_id %in% c('Cirino, 2018; Longitudinal Predict [1]', 'Lachance, 2006; A longitudinal analy [1]', '[S] Hood, 2005; the role of temporal [1]')),
            studynum = umbrella, var.eff.size = vi)
 
 m5 <- robu(formula = final_e_size ~ 1 + ran_std, data = dat2,
